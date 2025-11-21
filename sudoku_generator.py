@@ -25,6 +25,14 @@ class SudokuGenerator:
     def __init__(self, row_length, removed_cells):
         self.row_length = row_length
         self.removed_cells = removed_cells
+        #create 2D board below
+        self.board = []
+        for r in range(self.row_length):
+            row = [] # makes a new row
+            for c in range(self.row_length): # 9x9 sudoku board, so row length = column length
+                row.append(0)
+            self.board.append(row) # add the row to the board
+        # result is self.board is a list of 9 rows with each row being a list of 9 numbers (all currently 0)
 
 
     '''
@@ -34,7 +42,7 @@ class SudokuGenerator:
 	Return: list[list]
     '''
     def get_board(self):
-        pass
+        return self.board #board was built in the constructor
 
     '''
 	Displays the board to the console
