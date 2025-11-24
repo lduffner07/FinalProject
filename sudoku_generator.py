@@ -130,7 +130,20 @@ class SudokuGenerator:
                     return True
             return False
         return False
-
+    def unused_in_box(self, row_start, col_start):
+        used_numbers = set() # keeps track of the numbers that have already been used
+        unused_numbers = []
+        for i in range(row_start, row_start + 3):
+            for j in range(col_start, col_start + 3):
+                value = self.board[i][j]
+                # remember that when we initialized the board, we filled it all with 0s.
+                # so the if statement checks if the cell is empty since 0 represents an empty cell
+                if value != 0:
+                    used_numbers.add(value) # adds all non-zero numbers to the used list
+        for number in range(1, 10): # iterates through numbers 1 to 9
+            if number not in used_numbers: # checks if not used yet
+                unused_numbers.append(number) # adds to unused list
+        return unused_numbers
     '''
     Fills the specified 3x3 box with values
     For each position, generates a random digit which has not yet been used in the box
@@ -142,7 +155,12 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_box(self, row_start, col_start):
-        pass
+        for i in range(row_start, row_start + 3):
+            for j in range(col_start, col_start + 3):
+                valid_fill_numbers = self.unused_in_box(row_start, col_start)
+                fill_number = random.choice(valid_fill_numbers) #picks a valid unused number at random
+                self.board[i][j] = fill_number # replaces 0 with the random fill number
+
     
     '''
     Fills the three boxes along the main diagonal of the board
@@ -152,7 +170,8 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_diagonal(self):
-        pass
+        for index in range(0,9,3):
+            self.fill_box(index, index) # will be (0,0), (3,3), (6,6) to fill the 3 3x3 boxes on the diagonal
 
     '''
     DO NOT CHANGE
@@ -166,7 +185,7 @@ class SudokuGenerator:
 	Return:
 	boolean (whether or not we could solve the board)
     '''
-    def fill_remaining(self, row, col):
+    def fill_remaining(self, row, col): #did not write this code, was provided to us
         if (col >= self.row_length and row < self.row_length - 1):
             row += 1
             col = 0
@@ -250,4 +269,18 @@ def generate_sudoku(size, removed):
 
 
 
-# This is a test
+class Cell:
+    def __init__(self, value, row, col, screen):
+        self.value = value
+        self.row = row
+        self.col = col
+        self.screen = screen
+        self.sketched_value = 0 #temporary value that the player is guessing/testing
+    def set_cell_value(self, value):
+        self.value = value
+    def set_sketched_value(self, value):
+        self.sketched_value = value
+    def draw(self):
+
+
+
