@@ -300,5 +300,35 @@ class Cell:
     def draw(self):
         pass
 
+class Board:
+    def __init__(self, width, height, screen, difficulty):
+        self.width=width
+        self.height=height
+        self.screen=screen
+        self.difficulty=difficulty
+
+        if difficulty == "easy":
+            removed=30
+        if difficulty == "medium":
+            removed=40
+        if difficulty == "hard":
+            removed=50
+
+        self.original_board=generate_sudoku(9, removed)
+        self.rows=9
+        self.cols=9
+        self.cell_width=width//9
+        self.cell_height=height//9
+        self.selected=None
+
+        self.board=[]
+        for r in range(self.rows):
+            row_list=[]
+            for c in range(self.cols):
+                value=self.original_board[r][c]
+                row_list.append(Cell(value, r, c, screen))
+            self.board.append(row_list)
+
+
 
 
