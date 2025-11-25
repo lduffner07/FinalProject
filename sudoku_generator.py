@@ -237,7 +237,24 @@ class SudokuGenerator:
 	Return: None
     '''
     def remove_cells(self):
-        pass
+        # This is a counter how many cells are empty
+        cells_cleared = 0
+        row_max = self.row_length - 1
+        col_max = self.row_length - 1
+
+        # Keep going until we have removed the specified number of cells.
+        while cells_cleared < self.removed_cells:
+            # Randomly select a row and column index.
+            row = random.randint(0, row_max)
+            col = random.randint(0, col_max)
+
+            # Check if this cell still has a number (is not already cleared, where 0 represents an empty cell).
+            if self.board[row][col] != 0:
+                # If it's not empty, clear the cell by setting its value to 0.
+                self.board[row][col] = 0
+
+                # adds how many sucessful clears.
+                cells_cleared += 1
 
 '''
 DO NOT CHANGE
@@ -255,7 +272,7 @@ removed is the number of cells to clear (set to 0)
 Return: list[list] (a 2D Python list to represent the board)
 '''
 
-# this is a second test
+
 
 def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
@@ -264,7 +281,7 @@ def generate_sudoku(size, removed):
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
-    test = test
+
 
 
 
@@ -281,6 +298,7 @@ class Cell:
     def set_sketched_value(self, value):
         self.sketched_value = value
     def draw(self):
+        pass
 
 
 
