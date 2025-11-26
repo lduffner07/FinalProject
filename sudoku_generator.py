@@ -329,6 +329,32 @@ class Board:
                 row_list.append(Cell(value, r, c, screen))
             self.board.append(row_list)
 
+def draw(self):
+    for row in self.board:
+        for cell in row:
+            cell.draw()
+    #needs to be finished still
+
+def select(self, row, col):
+    self.selected=(row, col)
+
+def click(self, x, y):
+    if x<0 or x>self.width or y<0 or y>self.height:
+        return None
+    row=y//self.cell_height
+    col=x//cell.cell_width
+    return (row, col)
+
+def clear(self):
+    if self.selected:
+        row, col=self.selected
+        if self.original_board[row][col] == 0:
+            self.board[row][col].set_cell_value(0)
+            self.board[row][col].set_sketched_value()
+
+
+
+
 
 
 
