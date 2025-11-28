@@ -163,6 +163,7 @@ class SudokuGenerator:
                 fill_number = random.choice(valid_fill_numbers) #picks a valid unused number at random
                 self.board[i][j] = fill_number # replaces 0 with the random fill number
 
+
     
     '''
     Fills the three boxes along the main diagonal of the board
@@ -255,7 +256,7 @@ class SudokuGenerator:
                 # If it's not empty, clear the cell by setting its value to 0.
                 self.board[row][col] = 0
 
-                # adds how many sucessful clears.
+                # adds how many successful clears.
                 cells_cleared += 1
 
 '''
@@ -283,10 +284,6 @@ def generate_sudoku(size, removed): #generates and returns a size-by-size sudoku
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
-
-
-
-
 
 class Cell:
     def __init__(self, value, row, col, screen):
@@ -353,7 +350,7 @@ class Board:
         elif difficulty == "hard":
             removed=50
 
-        self.original_board=generate_sudoku(9, removed)
+        self.original_board=generate_sudoku(9, removed) # generates and returns a 9x9 board
         self.rows = 9
         self.cols = 9
         self.cell_width = width // 9
@@ -367,7 +364,7 @@ class Board:
                 value=self.original_board[r][c]
                 row_list.append(Cell(value, r, c, screen))
             self.board.append(row_list)
-        # self.board becomes a 9x9 2D list of Cell objects
+        # self.board becomes a 9x9 2D list of Cell objects. NOTE: CELL OBJECTS
 
 
     def draw(self): #draws all 81 cells & the grid lines around each 3x3 square
@@ -399,7 +396,7 @@ class Board:
 
 
     def select(self, row, col):
-        self.selected=(row, col)
+        self.selected=(row, col)  # alters the class instance’s attribute so other methods on the same object can use it
 
     def click(self, x, y):
         if x<0 or x>self.width or y<0 or y>self.height:
@@ -409,38 +406,53 @@ class Board:
         return (row, col)
 
     def clear(self):
-        if self.selected:
-            row, col=self.selected
-            if self.original_board[row][col] == 0:
-                self.board[row][col].set_cell_value(0)
-                self.board[row][col].set_sketched_value()
+        if self.selected is not None: # this is true if the tuple stored in self.selected is non-empty
+            row, col=self.selected # tuple unpacking
+            if self.original_board[row][col] == 0: #checks if this cell was ORIGINALLY empty
+                self.board[row][col].set_cell_value(0)  # then you can clear the cell value to 0 ie: no final answer
+                self.board[row][col].set_sketched_value(0) # remove our sketched guess
 
     def sketch(self, value):
-        if self.selected:
+        if self.selected is not None:
             row, col=self.selected
-            self.board[row][col].self.sketched_value(value)
+            self.board[row][col].set_sketched_value(value)
 
     def place_number(self, value):
-        if self.selected:
+        if self.selected is not None:
             row, col=self.selected
             if self.original_board[row][col] == 0:
-                self.board[row][col].set_cell_value(value)
-                self.board[row][col].set_sketched_value(0)
+                self.board[row][col].set_cell_value(value) # sets value of selected cell to the user entered value
+                self.board[row][col].set_sketched_value(0) # clears the sketched guess
 
     def reset_to_original(self):
-        for r in range(9):
-            for c in range(9):
-                self.board[row][col].set_cell_value(self.original_board[r][c])
-                self.board[row][col].set_sketched_value(0)
+        for r in range(self.rows):
+            for c in range(self.cols):
+                original_value = self.original_board[r][c]
+                self.board[r][c].set_cell_value(original_value) # resets every cell to its original value
+                self.board[r][c].set_sketched_value(0) #clears all sketched guesses
 
     def is_full(self):
-        for r in range(9):
-            for c in range(9):
-                if self.original_board[r][c] == 0:
+        for r in range(self.rows):
+            for c in range(self.cols):
+                # remember that 0 represents an empty cell.
+                # Also remember that self.board[r][c] is a cell object, so .value retrieves the value of the cell
+                if self.board[r][c].value == 0:
                     return False
         return True
 
     def update_board(self):
+
+
+    def find_empty(self):
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if self.board[r][c].value == 0:
+                    return (r,c)
+        return None # no empty cell found
+
+    def check_board(self):
+
+
 
 
 
