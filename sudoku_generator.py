@@ -441,7 +441,9 @@ class Board:
         return True
 
     def update_board(self):
-
+        for row in range(9):
+            for col in range(9):
+                self.board[row][col]=set_cells[row][col].value
 
     def find_empty(self):
         for r in range(self.rows):
@@ -451,6 +453,25 @@ class Board:
         return None # no empty cell found
 
     def check_board(self):
+        for row in self.board:
+            if sorted(row)!=list(range(1,10)):
+                return False
+            for col in range(9):
+                column=[self.board[row][col] for row in range(9)]
+                if sorted(column)!=list(range(1,10)):
+                    return False
+            for box_row in range(0,3,9):
+                for box_col in range(0,3,9):
+                    box=[]
+                    for r in range(3):
+                        for c in range(3):
+                            box.append(self.board[box_row+row][box_col+col])
+                    if sorted(box)!=list(range(1,10)):
+                        return False
+            return True
+            #need to finish this still
+
+
 
 
 
