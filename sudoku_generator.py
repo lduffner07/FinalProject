@@ -364,7 +364,15 @@ class Board:
                 value=self.original_board[r][c]
                 row_list.append(Cell(value, r, c, screen))
             self.board.append(row_list)
-        # self.board becomes a 9x9 2D list of Cell objects. NOTE: CELL OBJECTS
+        # self.board becomes a 9x9 2D list of Cell objects storing all committed values. NOTE: CELL OBJECTS
+
+        # Used for the update_board function  later
+        self.current_board = []
+        for r in range(self.rows):
+            row_vals = []
+            for c in range(self.cols):
+                row_vals.append(self.board[r][c].value)  # start from whatever is in the Cell
+            self.current_board.append(row_vals)
 
 
     def draw(self): #draws all 81 cells & the grid lines around each 3x3 square
@@ -441,9 +449,10 @@ class Board:
         return True
 
     def update_board(self):
-        for row in range(9):
-            for col in range(9):
-                self.board[row][col]=set_cells[row][col].value
+        for r in range(self.rows):
+            for c in range(self.cols):
+                # update the current board
+                self.current_board[r][c]=self.board[r][c].value
 
     def find_empty(self):
         for r in range(self.rows):
@@ -453,23 +462,41 @@ class Board:
         return None # no empty cell found
 
     def check_board(self):
-        for row in self.board:
-            if sorted(row)!=list(range(1,10)):
+        # helper function to check if each row, column, and 3x3 box contains exactly [1,2,3,4,5,6,7,8,9]
+        def unit_is_valid(nums):
+            return sorted(nums) == [1,2,3,4,5,6,7,8,9] #returns a boolean
+
+        # checks all rows
+        for r in range(self.rows):
+            row_vals = []
+            for c in range(self.cols):
+                row_vals.append(self.board[r][c].value)
+            if not unit_is_valid(row_vals): #checks immediately if every row is valid
                 return False
-            for col in range(9):
-                column=[self.board[row][col] for row in range(9)]
-                if sorted(column)!=list(range(1,10)):
+
+        # checks all columns
+        for c in range(self.cols):
+            col_vals = []
+            for r in range(self.rows):
+                col_vals.append(self.board[r][c].value)
+            if not unit_is_valid(col_vals): #checks immediately if every column is valid
+                return False
+
+        # checks all 3x3 boxes
+        for box_row in range(0, self.rows, 3): # 0, 3, 6
+            for box_col in range(0, self.cols, 3): # 0, 3, 6
+                # Create the 3x3 boxes
+                box_vals = []
+                for r in range(box_row, box_row + 3):
+                    for c in range(box_col, box_col + 3):
+                        box_vals.append(self.board[r][c].value)
+                if not unit_is_valid(box_vals):
                     return False
-            for box_row in range(0,3,9):
-                for box_col in range(0,3,9):
-                    box=[]
-                    for r in range(3):
-                        for c in range(3):
-                            box.append(self.board[box_row+row][box_col+col])
-                    if sorted(box)!=list(range(1,10)):
-                        return False
-            return True
-            #need to finish this still
+
+        # if we get here, that means every row, column, and 3x3 box test passed
+        return True
+
+
 
 
 
