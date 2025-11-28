@@ -1,4 +1,4 @@
-import math,random
+import math,random, pygame
 
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
@@ -25,6 +25,7 @@ class SudokuGenerator:
     def __init__(self, row_length, removed_cells):
         self.row_length = row_length
         self.removed_cells = removed_cells
+        self.box_length = int(math.sqrt(row_length))
         #create 2D board below
         self.board = []
         for r in range(self.row_length):
@@ -130,6 +131,7 @@ class SudokuGenerator:
                     return True
             return False
         return False
+
     def unused_in_box(self, row_start, col_start):
         used_numbers = set() # keeps track of the numbers that have already been used
         unused_numbers = []
@@ -274,7 +276,7 @@ Return: list[list] (a 2D Python list to represent the board)
 
 
 
-def generate_sudoku(size, removed):
+def generate_sudoku(size, removed): #generates and returns a size-by-size sudoku board
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
     board = sudoku.get_board()
@@ -293,12 +295,49 @@ class Cell:
         self.col = col
         self.screen = screen
         self.sketched_value = 0 #temporary value that the player is guessing/testing
+        self.selected = False # whether the user has clicked this cell
+
     def set_cell_value(self, value):
         self.value = value
+
     def set_sketched_value(self, value):
         self.sketched_value = value
-    def draw(self):
-        pass
+
+    def draw(self): #draws each individual cell & its border
+        # Figures out where this cell is placed on the screen
+        # compute cell size based on current screen size
+        cell_width = self.screen.get_width() // 9
+        cell_height = self.screen.get_height() // 9
+
+        x = self.col * cell_width
+        y = self.row * cell_height
+        # Make a square for this cell's area
+        rect = pygame.Rect(x, y, cell_width, cell_height)
+
+        # On the window (self.screen), draw a solid white rectangle (represented by (255,255,255)) in the area described by rect
+        pygame.draw.rect(self.screen, (255, 255, 255), rect)
+
+        # draw the border: red if selected, black otherwise
+        if self.selected: # if true
+            border_color = (255, 0, 0)  # red
+        else:
+            border_color = (0, 0, 0)  # black
+        pygame.draw.rect(self.screen, border_color, rect)
+
+        # if the cell has a value that is NOT 0, draw it in the center of the cell
+        if self.value != 0:
+            font = pygame.font.Font(None, 40)  # default font, size 40, will adjust font size accordingly later
+
+            # Turn the number into an image in black
+            text_surface = font.render(str(self.value), True, (0, 0, 0)) # True means to create smooth text, color is black
+
+            # Places the image generated from text_surface at the center of the cell
+            text_rect = text_surface.get_rect(center=rect.center)
+
+            # Draws the image in text_surface onto the game window at the text_rect position
+            self.screen.blit(text_surface, text_rect)
+
+
 
 class Board:
     def __init__(self, width, height, screen, difficulty):
@@ -309,31 +348,55 @@ class Board:
 
         if difficulty == "easy":
             removed=30
-        if difficulty == "medium":
+        elif difficulty == "medium":
             removed=40
-        if difficulty == "hard":
+        elif difficulty == "hard":
             removed=50
 
         self.original_board=generate_sudoku(9, removed)
-        self.rows=9
-        self.cols=9
-        self.cell_width=width//9
-        self.cell_height=height//9
-        self.selected=None
+        self.rows = 9
+        self.cols = 9
+        self.cell_width = width // 9
+        self.cell_height = height // 9
+        self.selected = None
 
-        self.board=[]
+        self.board = []
         for r in range(self.rows):
             row_list=[]
             for c in range(self.cols):
                 value=self.original_board[r][c]
                 row_list.append(Cell(value, r, c, screen))
             self.board.append(row_list)
+        # self.board becomes a 9x9 2D list of Cell objects
 
-    def draw(self):
+
+    def draw(self): #draws all 81 cells & the grid lines around each 3x3 square
+        # draws all 81 individual cells
         for row in self.board:
             for cell in row:
                 cell.draw()
-    #needs to be finished still
+
+        # Draw the grid lines around each 3x3 square
+        # Vertical lines
+        for i in range(10):
+            x = i * self.cell_width # where to draw the vertical grid lines
+            if i % 3 == 0:
+                border_width = 4 # thicker border for every 3rd line for 3x3 grid
+            else:
+                border_width = 1 # thinner border
+
+            # inputs are (screen, line color, starting position, ending position, border width)
+            pygame.draw.line(self.screen, (0,0,0), (x, 0), (x, self.height), border_width)
+
+        # Horizontal lines
+        for i in range(10):
+            y = i * self.cell_height # where to draw the horizontal grid lines
+            if i % 3 == 0:
+                border_width = 4 # thicker border for every 3rd line for 3x3 grid
+            else:
+                border_width = 1 #thinner border
+            pygame.draw.line(self.screen, (0,0,0), (0,y), (self.width, y), border_width)
+
 
     def select(self, row, col):
         self.selected=(row, col)
@@ -342,7 +405,7 @@ class Board:
         if x<0 or x>self.width or y<0 or y>self.height:
             return None
         row=y//self.cell_height
-        col=x//cell.cell_width
+        col=x//self.cell_width
         return (row, col)
 
     def clear(self):
