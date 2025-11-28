@@ -415,6 +415,33 @@ class Board:
                 self.board[row][col].set_cell_value(0)
                 self.board[row][col].set_sketched_value()
 
+    def sketch(self, value):
+        if self.selected:
+            row, col=self.selected
+            self.board[row][col].self.sketched_value(value)
+
+    def place_number(self, value):
+        if self.selected:
+            row, col=self.selected
+            if self.original_board[row][col] == 0:
+                self.board[row][col].set_cell_value(value)
+                self.board[row][col].set_sketched_value(0)
+
+    def reset_to_original(self):
+        for r in range(9):
+            for c in range(9):
+                self.board[row][col].set_cell_value(self.original_board[r][c])
+                self.board[row][col].set_sketched_value(0)
+
+    def is_full(self):
+        for r in range(9):
+            for c in range(9):
+                if self.original_board[r][c] == 0:
+                    return False
+        return True
+
+    def update_board(self):
+
 
 
 
